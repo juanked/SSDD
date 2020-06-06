@@ -10,34 +10,35 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     private static final String AFSDir = "AFSDir/";
     private RandomAccessFile lector;
 
-    public ViceReaderImpl(String fileName, String modoEjec) throws RemoteException {
+    public ViceReaderImpl(String fileName) throws RemoteException {
         try {
             String directorio = AFSDir + fileName;
-            this.lector = new RandomAccessFile(directorio, modoEjec);
+            this.lector = new RandomAccessFile(directorio, "r");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        
     }
 
     public byte[] read(int tam) throws RemoteException {
         try {
             byte[] b = new byte[tam];
-            for (int i = 0; i < b.length; i++) {
-                int leido = lector.read(b);
-                
+            int tamaNo;
+            tamaNo = lector.read(b);
+            for (int i = 0; i < b.length && tamaNo != -1; i++) {
+                b[i] = lector.readByte();
             }
-            
+            return b;
         } catch (IOException e) {
-            //TODO: handle exception
+            e.printStackTrace();
         }
-
-        return b;
+        return null;
     }
 
     public void close() throws RemoteException {
-        return;
+        try {
+            lector.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
