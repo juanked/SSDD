@@ -13,7 +13,7 @@ public class VenusFile {
             throws RemoteException, IOException, FileNotFoundException {
         try {
             String directorio = cacheDir + fileName;
-            this.lector = new RandomAccessFile(directorio, "r");
+            this.lector = new RandomAccessFile(directorio, mode);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

@@ -20,13 +20,18 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     }
 
     public byte[] read(int tam) throws RemoteException {
+        if(tam < 0) return null; 
         try {
-            byte[] b = new byte[tam];
-            int tamaNo;
-            tamaNo = lector.read(b);
-            for (int i = 0; i < b.length && tamaNo != -1; i++) {
-                b[i] = lector.readByte();
-            }
+            byte[] b = new byte[tam];            
+            int tamaNo = lector.read(b);
+            if (tamaNo == -1) return null;
+            if (tamaNo < tam){
+                byte[] new_b = new byte[tamaNo];
+                for (int i = 0; i < new_b.length; i++) {
+                    new_b[i] = b[i];  
+                }
+                return new_b;
+            }                       
             return b;
         } catch (IOException e) {
             e.printStackTrace();
