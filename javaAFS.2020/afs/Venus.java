@@ -2,10 +2,30 @@
 // ficheros remotos
 package afs;
 
-import java.rmi.*; 
+import java.rmi.*;
 
 public class Venus {
-    public Venus() {
-    }
-}
+    private String host;
+    private int port;
+    private int blocksize;
 
+    public Venus() {
+        this.host = System.getenv().get("REGISTRY_HOST");
+        this.port = Integer.parseInt(System.getenv().get("REGISTRY_PORT"));
+        this.blocksize = Integer.parseInt(System.getenv().get("BLOCKSIZE"));
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getBlocksize() {
+        return blocksize;
+    }
+
+
+}
