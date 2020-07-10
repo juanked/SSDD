@@ -27,7 +27,7 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
             if (tamaNo == -1) return null;
             if (tamaNo < tam){
                 byte[] new_b = new byte[tamaNo];
-                for (int i = 0; i < new_b.length; i++) {
+                for (int i = 0; i < tamaNo; i++) {
                     new_b[i] = b[i];  
                 }
                 return new_b;
