@@ -12,8 +12,8 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 
     public ViceReaderImpl(String fileName) throws RemoteException {
         try {
-            String directorio = AFSDir + fileName;
-            this.lector = new RandomAccessFile(directorio, "r");
+            String localizacion = AFSDir + fileName;
+            this.lector = new RandomAccessFile(localizacion, "r");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
