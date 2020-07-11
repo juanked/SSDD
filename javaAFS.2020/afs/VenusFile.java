@@ -41,8 +41,7 @@ public class VenusFile {
         } catch (FileNotFoundException e) {
             System.out.println("fichero no encontrado");
             lector = new RandomAccessFile(cacheDir + "fail", "rw");
-        }
-        
+        }        
     }
 
     public int read(byte[] b) throws RemoteException, IOException {

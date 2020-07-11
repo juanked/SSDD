@@ -9,12 +9,14 @@ import java.io.*;
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     private static final String AFSDir = "AFSDir/";
     private RandomAccessFile lector;
+    private RandomAccessFile lector2;
 
     public ViceReaderImpl(String fileName) throws RemoteException {
         try {
             String localizacion = AFSDir + fileName;
             this.lector = new RandomAccessFile(localizacion, "r");
         } catch (FileNotFoundException e) {
+            System.exit(-1);
             e.printStackTrace();
         }
     }
@@ -22,6 +24,7 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     public byte[] read(int tam) throws RemoteException {
         if(tam < 0) return null; 
         try {
+            this.lector = new RandomAccessFile(AFSDir + "Se mete aqui", "rs");
             byte[] b = new byte[tam];
             int tamaNo = lector.read(b);
             if (tamaNo == -1) return null;
