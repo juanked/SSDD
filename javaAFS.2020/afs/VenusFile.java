@@ -9,33 +9,30 @@ public class VenusFile {
 
     private Vice vice;
     private Venus venus;
-    private ViceReader viceReader;
     private ViceWriter viceWriter;
     private static final String cacheDir = "Cache/";
     private RandomAccessFile lector;
     private boolean Actualizado;
     private String directorio;
+    private File fileTMP;
 
     public VenusFile(Venus venus, String fileName, String mode)
             throws RemoteException, IOException, FileNotFoundException {
 
         this.venus = venus;
-        directorio = cacheDir + fileName;
-        File tmpDir = new File(directorio);
-        this.Actualizado = false;
-        viceReader = venus.getVice().download(directorio);
-
-        if (!tmpDir.exists()) {
+        this.fileTMP = new File(cacheDir + fileName);
+        ViceReader viceReader = this.venus.getVice().download(fileName);
+        
+        if (!fileTMP.exists()) {
+            this.lector = new RandomAccessFile(this.fileTMP, "rw");
             byte b[];
-            lector = new RandomAccessFile(tmpDir, "rw");
             while ((b = viceReader.read(venus.getBlocksize())) != null) {
                 lector.write(b);
-            }
-            viceReader.close();
-            lector.close();
+            } 
+            this.lector.close();
         }
-        // Se crea el RandomAccesFile con el modo que se especifica en el constructor
-        lector = new RandomAccessFile(directorio, mode);
+        this.lector = new RandomAccessFile(cacheDir + fileName, mode);        
+        viceReader.close();
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
@@ -53,15 +50,19 @@ public class VenusFile {
 
     public void setLength(long l) throws RemoteException, IOException {
         lector.setLength(l);
+        Actualizado = true;
     }
 
     public void close() throws RemoteException, IOException {
         if (Actualizado) {
+
             lector.seek(0);
             byte[] b = new byte[this.venus.getBlocksize()];
-            vice = venus.getVice();
-            viceWriter = vice.upload(directorio);
+            viceWriter = this.venus.getVice().upload(directorio);
+            long tam = this.lector.length();
+            viceWriter.changeLength(tam);
             int aux;
+
             while ((aux = lector.read(b)) > 0) {
                 if (this.venus.getBlocksize() > aux) {
                     byte[] new_b = new byte[aux];
@@ -73,6 +74,7 @@ public class VenusFile {
                     viceWriter.write(b);
                 }
             }
+            viceWriter.close();
         }
         lector.close();
     }

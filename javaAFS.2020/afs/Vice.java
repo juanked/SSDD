@@ -8,7 +8,7 @@ public interface Vice extends Remote {
     public ViceReader download(String fileName /* añada los parámetros que requiera */)
           throws RemoteException, FileNotFoundException;
     public ViceWriter upload(String fileName /* añada los parámetros que requiera */)
-          throws RemoteException;
+          throws RemoteException, FileNotFoundException;
 
     /* añada los métodos remotos que requiera */
 }
