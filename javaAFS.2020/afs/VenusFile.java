@@ -16,32 +16,26 @@ public class VenusFile {
     private boolean Actualizado;
     private String directorio;
 
-    public VenusFile(Venus venus, String fileName, String mode) 
-        throws RemoteException, IOException, FileNotFoundException {
-        
+    public VenusFile(Venus venus, String fileName, String mode)
+            throws RemoteException, IOException, FileNotFoundException {
+
+        this.venus = venus;
         directorio = cacheDir + fileName;
         File tmpDir = new File(directorio);
         this.Actualizado = false;
-        this.venus = venus;
+        viceReader = venus.getVice().download(directorio);
 
-        try {
-            if(!tmpDir.exists()) {
-                byte b [];
-                vice = venus.getVice();
-                viceReader = vice.download(directorio);
-                lector = new RandomAccessFile(directorio, "rw");
-                while ((b = viceReader.read(venus.getBlocksize())) != null) {
-                    lector.write(b);
-                }            
-                viceReader.close();
-                lector.close();
-            }        
-            // Se crea el RandomAccesFile con el modo que se especifica en el constructor
-            lector = new RandomAccessFile(directorio, mode);
-        } catch (FileNotFoundException e) {
-            System.out.println("fichero no encontrado");
-            lector = new RandomAccessFile(cacheDir + "fail", "rw");
-        }        
+        if (!tmpDir.exists()) {
+            byte b[];
+            lector = new RandomAccessFile(tmpDir, "rw");
+            while ((b = viceReader.read(venus.getBlocksize())) != null) {
+                lector.write(b);
+            }
+            viceReader.close();
+            lector.close();
+        }
+        // Se crea el RandomAccesFile con el modo que se especifica en el constructor
+        lector = new RandomAccessFile(directorio, mode);
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
@@ -62,21 +56,20 @@ public class VenusFile {
     }
 
     public void close() throws RemoteException, IOException {
-        if(Actualizado){
+        if (Actualizado) {
             lector.seek(0);
-            byte [] b = new byte [this.venus.getBlocksize()];
+            byte[] b = new byte[this.venus.getBlocksize()];
             vice = venus.getVice();
             viceWriter = vice.upload(directorio);
             int aux;
-            while((aux = lector.read(b)) > 0){
-                if(this.venus.getBlocksize() > aux){
-                    byte [] new_b = new byte [aux];
+            while ((aux = lector.read(b)) > 0) {
+                if (this.venus.getBlocksize() > aux) {
+                    byte[] new_b = new byte[aux];
                     for (int i = 0; i < aux; i++) {
-                        new_b [i] = b [i];
+                        new_b[i] = b[i];
                     }
                     viceWriter.write(new_b);
-                }
-                else{
+                } else {
                     viceWriter.write(b);
                 }
             }

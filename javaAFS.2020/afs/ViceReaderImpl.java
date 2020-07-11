@@ -9,37 +9,32 @@ import java.io.*;
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     private static final String AFSDir = "AFSDir/";
     private RandomAccessFile lector;
-    private RandomAccessFile lector2;
+    private File file;
 
-    public ViceReaderImpl(String fileName) throws RemoteException {
-        try {
-            String localizacion = AFSDir + fileName;
-            this.lector = new RandomAccessFile(localizacion, "r");
-        } catch (FileNotFoundException e) {
-            System.exit(-1);
-            e.printStackTrace();
-        }
+    public ViceReaderImpl(String fileName) throws RemoteException, FileNotFoundException {
+        String localizacion = AFSDir + fileName;
+        this.file = new File(localizacion);
+        this.lector = new RandomAccessFile(this.file, "r");
     }
 
-    public byte[] read(int tam) throws RemoteException {
-        if(tam < 0) return null; 
-        try {
-            this.lector = new RandomAccessFile(AFSDir + "Se mete aqui", "rs");
-            byte[] b = new byte[tam];
-            int tamaNo = lector.read(b);
-            if (tamaNo == -1) return null;
-            if (tamaNo < tam){
-                byte[] new_b = new byte[tamaNo];
-                for (int i = 0; i < tamaNo; i++) {
-                    new_b[i] = b[i];  
-                }
-                return new_b;
-            }                       
-            return b;
-        } catch (IOException e) {
-            e.printStackTrace();
+    public byte[] read(int tam) throws IOException, RemoteException {
+        
+        long pos = this.lector.getFilePointer();
+        long len = this.lector.length();
+
+        byte buffer[];
+
+        if (len - pos <= 0) {
+            return null;
         }
-        return null;
+        if (pos + tam <= len) {
+            buffer = new byte[tam];
+        } else {
+            buffer = new byte[(int) (len - pos)];
+        }
+        this.lector.read(buffer);
+        return buffer;
+
     }
 
     public void close() throws RemoteException {
