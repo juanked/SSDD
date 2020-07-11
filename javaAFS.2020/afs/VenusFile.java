@@ -16,7 +16,8 @@ public class VenusFile {
     private boolean Actualizado;
     private String directorio;
 
-    public VenusFile(Venus venus, String fileName, String mode) throws RemoteException, IOException, FileNotFoundException {
+    public VenusFile(Venus venus, String fileName, String mode) 
+        throws RemoteException, IOException, FileNotFoundException {
         
         directorio = cacheDir + fileName;
         File tmpDir = new File(directorio);
@@ -39,6 +40,7 @@ public class VenusFile {
             lector = new RandomAccessFile(directorio, mode);
         } catch (FileNotFoundException e) {
             System.out.println("fichero no encontrado");
+            lector = new RandomAccessFile(cacheDir + "fail", "rw");
         }
         
     }

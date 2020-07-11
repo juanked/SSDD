@@ -22,7 +22,7 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     public byte[] read(int tam) throws RemoteException {
         if(tam < 0) return null; 
         try {
-            byte[] b = new byte[tam];            
+            byte[] b = new byte[tam];
             int tamaNo = lector.read(b);
             if (tamaNo == -1) return null;
             if (tamaNo < tam){
