@@ -10,36 +10,38 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 
     private static final String AFSDir = "AFSDir/";
     private File fileTMP;
-    private Vice vice;
+    private Vice viceRef;
     private RandomAccessFile lector;
 
     /* añada los parámetros que requiera */
-    public ViceReaderImpl(String fileName) throws FileNotFoundException, RemoteException {
-        //this.vice= vice;
+    public ViceReaderImpl(String fileName, Vice viceRef) throws FileNotFoundException, RemoteException {
+        this.viceRef= viceRef;
         this.fileTMP = new File(AFSDir + fileName);
-        this.lector = new RandomAccessFile(this.fileTMP, "r");
+        this.lector = new RandomAccessFile(AFSDir + fileName, "r");
     }
 
     public byte[] read(int tam) throws RemoteException, IOException {
-        byte[] b = new byte[tam];
-        int result = lector.read(b);
+        long posicion = this.lector.getFilePointer();
+        long size = this.lector.length();
+        byte b[] = null;
 
-        if (result == -1) {
-            return null;
+        long cmp = size - posicion;
+        if (cmp <= 0)  return b;
+        
+        cmp = posicion + tam;
+        if (cmp <= size) {
+            b = new byte[tam];
+        } else {
+            int newTam = (int) (size - posicion);
+            b = new byte[newTam];
         }
-        if (result < tam) {
-            byte[] new_b = new byte[result];
-            for (int i = 0; i < result; i++) {
-                new_b[i] = b[i];
-            }
-            return new_b;
-        }
+        this.lector.read(b);
         return b;
     }
 
     public void close() throws RemoteException, IOException {
         this.lector.close();
-        //this.vice.bind(this.fileTMP.getName()).readLock().unlock();
-        //this.vice.unbind(this.fileTMP.getName());
+        this.viceRef.bind(this.fileTMP.getName()).readLock().unlock();
+        this.viceRef.unbind(this.fileTMP.getName());
     }
 }

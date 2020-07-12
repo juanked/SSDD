@@ -13,13 +13,13 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
 
     private static final String AFSDir = "AFSDir/";
     private RandomAccessFile escritor;
-    private Vice vice;
-    private File file;
+    private Vice viceRef;
+    private File fileTMP;
 
-    public ViceWriterImpl(final String fileName) throws RemoteException, FileNotFoundException {
-        //this.vice = vice;
+    public ViceWriterImpl(final String fileName, Vice viceRef) throws RemoteException, FileNotFoundException {
+        this.viceRef = viceRef;
         String localizacion = AFSDir + fileName;
-        this.file = new File(localizacion);
+        this.fileTMP = new File(localizacion);
         escritor = new RandomAccessFile(localizacion, "rw");
     }
 
@@ -29,8 +29,8 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
 
     public void close() throws RemoteException, IOException {
         escritor.close();
-        //this.vice.unbind(this.file.getName());
-        //this.vice.bind(this.file.getName()).writeLock().unlock();
+        this.viceRef.unbind(this.fileTMP.getName());
+        this.viceRef.bind(this.fileTMP.getName()).writeLock().unlock();
     }
 
     public void changeLength(long l) throws RemoteException, IOException {

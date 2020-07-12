@@ -11,7 +11,7 @@ public class VenusFile {
     private Venus venus;
     private ViceWriter viceWriter;
     private static final String cacheDir = "Cache/";
-    private RandomAccessFile lector;
+    private RandomAccessFile rAccessFile;
     private boolean Actualizado;
     private String directorio;
     private File fileTMP;
@@ -21,61 +21,62 @@ public class VenusFile {
 
         this.venus = venus;
         this.fileTMP = new File(cacheDir + fileName);
-        ViceReader viceReader = this.venus.getVice().download(fileName);
+        ViceReader lector = this.venus.getVice().download(fileName, venus.getrefCB());
         
         if (!fileTMP.exists()) {
-            this.lector = new RandomAccessFile(this.fileTMP, "rw");
+            this.rAccessFile = new RandomAccessFile(this.fileTMP, "rw");
             byte b[];
-            while ((b = viceReader.read(venus.getBlocksize())) != null) {
-                lector.write(b);
+            while ((b = lector.read(venus.getBlocksize())) != null) {
+                rAccessFile.write(b);
             } 
-            this.lector.close();
+            this.rAccessFile.close();
         }
-        this.lector = new RandomAccessFile(cacheDir + fileName, mode);        
-        viceReader.close();
+        this.rAccessFile = new RandomAccessFile(cacheDir + fileName, mode);        
+        lector.close();
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
-        return lector.read(b);
+        return rAccessFile.read(b);
     }
 
     public void write(byte[] b) throws RemoteException, IOException {
-        lector.write(b);
+        rAccessFile.write(b);
         Actualizado = true;
     }
 
     public void seek(long p) throws RemoteException, IOException {
-        lector.seek(p);
+        rAccessFile.seek(p);
     }
 
     public void setLength(long l) throws RemoteException, IOException {
-        lector.setLength(l);
+        rAccessFile.setLength(l);
         Actualizado = true;
     }
 
     public void close() throws RemoteException, IOException {
         if (Actualizado) {
 
-            lector.seek(0);
-            byte[] b = new byte[this.venus.getBlocksize()];
-            viceWriter = this.venus.getVice().upload(directorio);
-            long tam = this.lector.length();
-            viceWriter.changeLength(tam);
-            int aux;
+            ViceWriter escritor = this.venus.getVice().upload(this.fileTMP.getName(), this.venus.getrefCB());
+            long posicion = rAccessFile.getFilePointer();
+            long size = rAccessFile.length();
+            escritor.changeLength(size);
+            this.rAccessFile.seek(0);
+            byte b[];
 
-            while ((aux = lector.read(b)) > 0) {
-                if (this.venus.getBlocksize() > aux) {
-                    byte[] new_b = new byte[aux];
-                    for (int i = 0; i < aux; i++) {
-                        new_b[i] = b[i];
-                    }
-                    viceWriter.write(new_b);
-                } else {
-                    viceWriter.write(b);
-                }
+            while (posicion + venus.getBlocksize() <= size) {
+                b = new byte[venus.getBlocksize()];
+                this.rAccessFile.read(b);
+                escritor.write(b);
+                posicion = rAccessFile.getFilePointer();
             }
-            viceWriter.close();
+
+            if (size - posicion > 0) {
+                b = new byte[(int) (size - posicion)];
+                this.rAccessFile.read(b);
+                escritor.write(b);
+            }
+            escritor.close();
         }
-        lector.close();
+        rAccessFile.close();
     }
 }
