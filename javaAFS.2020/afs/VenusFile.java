@@ -21,7 +21,7 @@ public class VenusFile {
 
         this.venus = venus;
         this.fileTMP = new File(cacheDir + fileName);
-        ViceReader lector = this.venus.getVice().download(fileName, venus.getrefCB());
+        ViceReader lector = this.venus.getVice().download(fileName, mode, venus.getrefCB());
         
         if (!fileTMP.exists()) {
             this.rAccessFile = new RandomAccessFile(this.fileTMP, "rw");
@@ -36,21 +36,21 @@ public class VenusFile {
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
-        return rAccessFile.read(b);
+        return this.rAccessFile.read(b);
     }
 
     public void write(byte[] b) throws RemoteException, IOException {
-        rAccessFile.write(b);
-        Actualizado = true;
+        this.rAccessFile.write(b);
+        this.Actualizado = true;
     }
 
     public void seek(long p) throws RemoteException, IOException {
-        rAccessFile.seek(p);
+        this.rAccessFile.seek(p);
     }
 
     public void setLength(long l) throws RemoteException, IOException {
-        rAccessFile.setLength(l);
-        Actualizado = true;
+        this.rAccessFile.setLength(l);
+        this.Actualizado = true;
     }
 
     public void close() throws RemoteException, IOException {
@@ -67,7 +67,7 @@ public class VenusFile {
                 b = new byte[venus.getBlocksize()];
                 this.rAccessFile.read(b);
                 escritor.write(b);
-                posicion = rAccessFile.getFilePointer();
+                posicion = this.rAccessFile.getFilePointer();
             }
 
             if (size - posicion > 0) {

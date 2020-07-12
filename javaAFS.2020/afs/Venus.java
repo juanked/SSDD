@@ -21,22 +21,22 @@ public class Venus {
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     public int getBlocksize() {
-        return blocksize;
+        return this.blocksize;
     }
 
     public Vice getVice(){
-        return ref;
+        return this.ref;
     }
 
     public VenusCB getrefCB() {
-        return refCB;
+        return this.refCB;
     }
 }

@@ -7,7 +7,7 @@ import java.rmi.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public interface Vice extends Remote {
-      public ViceReader download(String fileName, VenusCB refCB) throws RemoteException, FileNotFoundException;
+      public ViceReader download(String fileName,String mode, VenusCB refCB) throws RemoteException, FileNotFoundException;
 
       public ViceWriter upload(String fileName, VenusCB refCB) throws RemoteException, FileNotFoundException;
 

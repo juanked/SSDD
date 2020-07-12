@@ -16,19 +16,19 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
     private Vice viceRef;
     private File fileTMP;
 
-    public ViceWriterImpl(final String fileName, Vice viceRef) throws RemoteException, FileNotFoundException {
+    public ViceWriterImpl(final String fileName, String mode, Vice viceRef) throws RemoteException, FileNotFoundException {
         this.viceRef = viceRef;
         String localizacion = AFSDir + fileName;
         this.fileTMP = new File(localizacion);
-        escritor = new RandomAccessFile(localizacion, "rw");
+        this.escritor = new RandomAccessFile(localizacion, mode);
     }
 
     public void write(final byte[] b) throws IOException {
-        escritor.write(b);
+        this.escritor.write(b);
     }
 
     public void close() throws RemoteException, IOException {
-        escritor.close();
+        this.escritor.close();
         this.viceRef.unbind(this.fileTMP.getName());
         this.viceRef.bind(this.fileTMP.getName()).writeLock().unlock();
     }

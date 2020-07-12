@@ -14,10 +14,10 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     private RandomAccessFile lector;
 
     /* añada los parámetros que requiera */
-    public ViceReaderImpl(String fileName, Vice viceRef) throws FileNotFoundException, RemoteException {
+    public ViceReaderImpl(String fileName, String mode, Vice viceRef) throws FileNotFoundException, RemoteException {
         this.viceRef= viceRef;
         this.fileTMP = new File(AFSDir + fileName);
-        this.lector = new RandomAccessFile(AFSDir + fileName, "r");
+        this.lector = new RandomAccessFile(AFSDir + fileName, mode);
     }
 
     public byte[] read(int tam) throws RemoteException, IOException {

@@ -18,8 +18,8 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
     this.dowloadedFiles = new HashMap<>();
   }
 
-    public ViceReader download(String fileName,VenusCB refCB) throws RemoteException, FileNotFoundException {
-    bind(fileName).readLock().lock();
+  public ViceReader download(String fileName,String mode, VenusCB refCB) throws RemoteException, FileNotFoundException {
+    this.bind(fileName).readLock().lock();
     if (dowloadedFiles.containsKey(fileName)) {
       dowloadedFiles.get(fileName).add(refCB);
     } else {
@@ -27,12 +27,12 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
       clients.add(refCB);
       dowloadedFiles.put(fileName, clients);
     } 
-    ViceReaderImpl lector = new ViceReaderImpl(fileName, this);
+    ViceReaderImpl lector = new ViceReaderImpl(fileName, mode, this);
     return lector;
   }
 
-    public ViceWriter upload(String fileName,VenusCB refCB) throws RemoteException, FileNotFoundException {
-    bind(fileName).writeLock().lock();
+  public ViceWriter upload(String fileName, VenusCB refCB) throws RemoteException, FileNotFoundException {
+    this.bind(fileName).writeLock().lock();
     if (dowloadedFiles.containsKey(fileName)) {
       for (VenusCB client : dowloadedFiles.get(fileName)) {
         if (!client.equals(refCB)) {
@@ -44,7 +44,7 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
       clients.add(refCB);
       dowloadedFiles.put(fileName, clients);
     }
-    ViceWriterImpl escritor = new ViceWriterImpl(fileName, this);
+    ViceWriterImpl escritor = new ViceWriterImpl(fileName, "rw", this);
     return escritor;
   }
 
@@ -54,5 +54,5 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
 
   public synchronized void unbind(String fileName) throws RemoteException {
     this.lock.unbind(fileName);
- }
+  }
 }
