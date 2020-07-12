@@ -57,10 +57,10 @@ public class VenusFile {
         if (Actualizado) {
 
             ViceWriter escritor = this.venus.getVice().upload(this.fileTMP.getName(), this.venus.getrefCB());
+            this.rAccessFile.seek(0);
             long posicion = rAccessFile.getFilePointer();
             long size = rAccessFile.length();
             escritor.changeLength(size);
-            this.rAccessFile.seek(0);
             byte b[];
 
             while (posicion + venus.getBlocksize() <= size) {

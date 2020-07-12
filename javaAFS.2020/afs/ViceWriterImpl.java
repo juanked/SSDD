@@ -29,8 +29,8 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
 
     public void close() throws RemoteException, IOException {
         this.escritor.close();
-        this.viceRef.unbind(this.fileTMP.getName());
         this.viceRef.bind(this.fileTMP.getName()).writeLock().unlock();
+        this.viceRef.unbind(this.fileTMP.getName());
     }
 
     public void changeLength(long l) throws RemoteException, IOException {
