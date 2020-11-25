@@ -1,1 +1,3 @@
 # SSDD
+
+Práctica sobre RMI.
